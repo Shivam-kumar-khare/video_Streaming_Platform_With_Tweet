@@ -1,4 +1,4 @@
-class ApiError{
+class ApiResponse{
     constructor(statuscode,data,message="Success")
     {
         this.statuscode=statuscode;
@@ -8,4 +8,4 @@ class ApiError{
         ;
     }
 }
-export {ApiError};
+export {ApiResponse};
