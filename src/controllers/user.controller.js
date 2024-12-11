@@ -9,7 +9,7 @@ import {ApiResponse} from "../utils/apiResponse.js";
 // })
 const registerUser=asyncHandler( async (req,res) =>  {
     const {fullName,email,userName,password}=req.body;
-    console.log("email::",email);//testing if got successfull response
+   // console.log("email::",email ,"\nfullname",fullName,"\nusername",userName,"\npassword",password);//testing if got successfull response
 
     //validations
     if(!fullName || !email || !userName  || !password ){
@@ -26,24 +26,27 @@ const registerUser=asyncHandler( async (req,res) =>  {
     }
 
 //req.file from multer
-    const avatarLocalPath = req.file?.avatar[0]?.path;
-    const coverImageLocalPath = req.file?.coverImage[0]?.path;
-
+    const avatarLocalPath = req.files?.avatar[0]?.path;
+    const coverimageLocalPath = req.files?.coverimage[0]?.path;
+    // console.log(req.files)
+    // console.log("avatarLocalPath::", avatarLocalPath); // Debugging
+    // console.log("coverimageLocalPath::", coverimageLocalPath); 
     if(!avatarLocalPath){
         throw new ApiError(400,"Avatar file is required");
     }
 
-    const avatar= await uploadOnCloudinary(avatarLocalPath)
-    const coverImage=coverImageLocalPath? await uploadOnCloudinary(coverImageLocalPath):null
+    const avatar= await uploadOnCloudinary(avatarLocalPath.replace(/\\/g, "/"))
+    const coverimage=coverimageLocalPath? await uploadOnCloudinary(coverimageLocalPath.replace(/\\/g, "/")):null;
+    // console.log("avatar",avatar,"\ncoverimage::",coverimage)
 
-    if(!avatar){ throw new ApiError(400,"avatar file is required ")}
+    if(!avatar){ throw new ApiError(400,"avatar file is required problem on uplading on cloudinary ")}
 
 
     
     const user= await User.create({
         fullName,
         avatar:avatar.url,
-        coverImage:coverImage?.url||"",
+        coverimage:coverimage?.url||"",
         email,
         password,
         userName:userName.toLowerCase()
