@@ -1,5 +1,5 @@
 import mongoose ,{Schema} from "mongoose";
-import jwt from "json-web-token";
+import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
 
@@ -9,7 +9,7 @@ const userSchema= new Schema({
         required:true,
         unique:true,
         lowercase:true,
-        trim:[50,"max character limit is 50"],
+        maxlength:[50,"max character limit is 50"],
         index:true
     },
     email:{
@@ -17,13 +17,13 @@ const userSchema= new Schema({
         required:true,
         unique:true,
         lowercase:true,
-        trim:[50,"max character limit is 50"],
+        maxlength:[50,"max character limit is 50"],
     },
     fullName:{
         type: String,
         required:true,
         lowercase:true,
-        trim:[50,"max character limit is 50"],
+        maxlength:[50,"max character limit is 50"],
         index:true
     },
     avatar:{
@@ -35,8 +35,7 @@ const userSchema= new Schema({
         type: String,
         required:[true,"password is required"],
         unique:true,
-        lowercase:true,
-        trim:[50,"max character limit is 50"],
+        maxlength:[50,"max character limit is 50"],
         index:true
     },
     refreshToken: String,
@@ -50,7 +49,7 @@ const userSchema= new Schema({
 
 userSchema.pre("save", async function (next) {
     try {
-        if (!this.isModified("password")) return;
+        if (!this.isModified("password")) return next();//added next flag here
         this.password = await bcrypt.hash(this.password, 10);
         next();
     } catch (err) {
@@ -71,7 +70,7 @@ userSchema.methods.generateAccessToken = function () {
         {
             _id: this._id,
             email: this.email,
-            username: this.username
+            userName: this.userName
         },
         process.env.ACCESS_TOKEN_SECRET,
         { expiresIn: process.env.ACCESS_TOKEN_EXPIRY }
