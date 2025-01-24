@@ -57,6 +57,8 @@ userSchema.pre("save", async function (next) {
     }
 });
 
+
+//https://mongoosejs.com/docs/middleware.html  //read about pre midlleware;
 userSchema.methods.isPasswordCorrect = async function (password) {
     try {
         return await bcrypt.compare(password, this.password);

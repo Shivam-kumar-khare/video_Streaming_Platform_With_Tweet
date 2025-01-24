@@ -20,7 +20,8 @@ const uploadOnCloudinary = async (localFilePath) => {
             resource_type: "auto"
         })
         fs.unlinkSync(localFilePath)
-        console.log("file upladed successfully on cloudinary", response.url);
+        // console.log(response)
+        console.log("\n\nfile uploaded successfully on cloudinary\n", response.url);
         return response;
 
     }
@@ -31,5 +32,33 @@ const uploadOnCloudinary = async (localFilePath) => {
 
     }
 }
+const deleteFromCloudinary=async (filePath)=>{
+    
+    try {
+        if (!filePath) {
+            console.error("file path not found to delete");
+            return null;
+        }
+        
+        const url=filePath.split('/')
+        const fileName=url[url.length-1];
+        const publicId = fileName.substring(0, fileName.lastIndexOf('.'));
 
-export {uploadOnCloudinary};
+        if (!publicId) {
+            console.error("Failed to extract public ID from file path.");
+            return null;
+        }
+        
+        const result=await cloudinary.uploader
+        .destroy(
+            publicId,
+            {
+                invalidate:true
+            }
+        )
+        // console.log(result.result,"      file removed successfully");
+    } catch (error) {
+        console.log("an error occured while deleting the image===",error);
+    }
+}
+export {uploadOnCloudinary,deleteFromCloudinary};

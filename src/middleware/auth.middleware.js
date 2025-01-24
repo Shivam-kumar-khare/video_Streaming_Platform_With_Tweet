@@ -3,10 +3,12 @@ import { ApiError } from "../utils/apiError.js";
 import jwt from "jsonwebtoken";
 import { User } from "../model/user.model.js";
 
+
+//verify jwt used in C:\Users\Shivam\Desktop\MyYoutube\src\routes\user.routes.js
 export const verifyJWT =asyncHandler(async (req,res,next)=>{
     try {
-        const token= req.cookies?.accessToken || req.header("Authrization")?.replace("Bearer","")
-        console.log(token)
+        const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer", "");
+        // console.log(token)
         if(!token){
             throw  new ApiError(401,"Unauthorized Request")
         }
@@ -21,7 +23,7 @@ export const verifyJWT =asyncHandler(async (req,res,next)=>{
     
         next();
     } catch (error) {
-        throw new ApiError(401,`Error Caught in auth.midlleware.js ${error?.message||""}`)
+        throw new ApiError(401,`Error Caught in auth.midlleware.js ${error?.message||"invalid auth file"}`)
     }
 
 })
