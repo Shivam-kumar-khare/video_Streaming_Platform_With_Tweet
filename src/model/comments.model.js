@@ -1,9 +1,10 @@
-import mongoose ,{Schema,model}from "mongoose";
+import mongoose ,{Schema} from "mongoose";
 
 const commentsSchema = new Schema({
     content:{
         type:String,
-        maxlength:[400,"Maximum 400 character tweet allowed"]
+        maxlength:[400,"Maximum 400 character comments allowed"],
+        minlength:[1,"Empty comments are not allowed"]
     },
     video:{
         type:Schema.Types.ObjectId,
@@ -16,4 +17,4 @@ const commentsSchema = new Schema({
 
 }, { timestamps: true })
 
-export const Comment=model("Comment",commentsSchema)
+export const UserComment= mongoose.model("UserComment",commentsSchema)
