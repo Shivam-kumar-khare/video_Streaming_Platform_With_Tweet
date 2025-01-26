@@ -13,18 +13,18 @@ const createTweet = asyncHandler(async (req, res) => {
     const user=req.user._id
     if(!user)  throw new ApiError(400,"User is not logged in")
 
-    const response=await Tweet.create({
+    const tweet=await Tweet.create({
         content,
         owner:user
     })  
     
-    if (response) {
-        res.status(200).json(
-            new ApiResponse(200,response,"Tweet created Successfully")
-        )
-    } else {
+    if (!Object.keys(tweet).length) {
         throw new ApiError(500,"Problem Incurred During creating tweet")
+        
     }
+    res.status(200).json(
+        new ApiResponse(200,tweet,"Tweet created Successfully")
+    )
 
 
 })

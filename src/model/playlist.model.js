@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 
-const playlistSchema=new mongoose.model({
+const playlistSchema=new mongoose.Schema({
     name:{
         type:String,
         required:true,
@@ -9,7 +9,8 @@ const playlistSchema=new mongoose.model({
     },
     description:{
         type:String,
-        required:[true,"description is required"]
+        required:[true,"description is required"],
+        maxlength:[600,"Your playlist Description is too long"]
     },
     videos:[{
         type:mongoose.Schema.Types.ObjectId,
