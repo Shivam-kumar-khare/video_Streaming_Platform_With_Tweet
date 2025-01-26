@@ -9,6 +9,7 @@ const tweetsSchema = new mongoose.Schema(
     },
     content: {
       type: String,
+      require:true
     },
   },
   { timestamps: true } 
