@@ -57,6 +57,7 @@ const deleteFromCloudinary=async (filePath)=>{
             }
         )
         // console.log(result.result,"      file removed successfully");
+        return result;
     } catch (error) {
         console.log("an error occured while deleting the image===",error);
     }
