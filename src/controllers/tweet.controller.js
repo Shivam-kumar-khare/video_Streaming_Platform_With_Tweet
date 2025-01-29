@@ -18,7 +18,7 @@ const createTweet = asyncHandler(async (req, res) => {
         owner:user
     })  
     
-    if (!Object.keys(tweet).length) {
+    if (!tweet) {
         throw new ApiError(500,"Problem Incurred During creating tweet")
         
     }
@@ -85,19 +85,35 @@ const updateTweet = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Invalid Id")
     }
 
-    const content = req.body;
+    const {content} = req.body;
     if (!content) throw new ApiError(400, "Content Can not be empty");
 
-    const tweet = await Tweet.findById(tweetId);
-    if (!tweet) {
-        throw new ApiError(404, "Tweet not found");
-    }
+    const tweet=await Tweet.findOneAndUpdate(
+        {
+            _id:tweetId,
+            owner:mongoose.Types.ObjectId(req.user._id)
+        },
+        {
+            content:content
+        },
+        {
+            new :true
+        }
+    )
+        // const tweet = await Tweet.findById(tweetId);
+    // if (!tweet) {
+    //     throw new ApiError(404, "Tweet not found");
+    // }
 
-    if (tweet.owner.toString() !== req.user._id.toString()) {
-        throw new ApiError(403, "You Are Not Authenticated To Update this tweet")
+    // if (tweet.owner.toString() !== req.user._id.toString()) {
+    //     throw new ApiError(403, "You Are Not Authenticated To Update this tweet")
+    // }
+    // tweet.content = content.toString()
+    // await tweet.save();
+
+    if (!tweet) {
+        throw new ApiError(404, "Tweet not found or unauthorized to update");
     }
-    tweet.content = content.toString()
-    await tweet.save()
 
     res.status(200).json(
         new ApiResponse(200, tweet, "Tweets Updated")
@@ -128,7 +144,7 @@ const deleteTweet = asyncHandler(async (req, res) => {
     }
 
     // Delete the tweet
-    await tweet.deleteOne();
+    await tweet.deleteOne();  
 
     // Send response
     res.status(200).json(
