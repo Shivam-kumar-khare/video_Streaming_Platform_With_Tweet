@@ -119,19 +119,18 @@ const publishAVideo = asyncHandler(async (req, res) => {
 
 
     let videoLocalPath;
-    console.log(req.file)
 
-
-    if (req.file && Array.isArray(req.file.videoLocalPath) && req.files.videoLocalPath.length > 0) {
-        console.log(req.file)
-        videoLocalPath = req.file.videoLocalPath[0].path;
-
+    console.log(req.file);
+    
+    if (req.file && req.file.path) {
+        videoLocalPath = req.file.path;
+    } else {
+        throw new ApiError(404, "Video File not found");
     }
-    else { throw new ApiError(404, "Video File not found") }
-
+    
 
     const video = videoLocalPath ? await uploadOnCloudinary(videoLocalPath) : null
-
+    console.log("\n\n\n",video)
     const videoObject = {
         owner: req.user._id,
         videofile: video.url,
@@ -141,8 +140,8 @@ const publishAVideo = asyncHandler(async (req, res) => {
     }
 
     const publishedVideo = await Video.create(videoObject)
-
-    if (publishedVideo === 0) {
+    console.log("\n\n\n",publishedVideo)
+    if (!publishedVideo ) {
         throw new ApiError(400, "Video Uploadation failed")
     }
 

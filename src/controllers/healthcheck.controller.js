@@ -1,4 +1,4 @@
-import { asyncHandler } from "../utils/asyncHandler.js"
+import { asyncHandler } from "../utils/asyncHandler.utils.js"
 
 
 const healthcheck = asyncHandler(async (_, res) => {
