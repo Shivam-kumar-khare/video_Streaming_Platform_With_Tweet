@@ -16,9 +16,16 @@ const uploadOnCloudinary = async (localFilePath) => {
             return null;
         }
 
-        const response = await cloudinary.uploader.upload(localFilePath, {
-            resource_type: "auto"
-        })
+        const response = await cloudinary.uploader.upload(
+            localFilePath,
+            {
+                resource_type: "auto",
+                transformation: [
+                    { quality: "auto" }, // Optimize
+                    { fetch_format: "auto" } // Auto-format
+                ]
+            }
+        )
         fs.unlinkSync(localFilePath)
         // console.log(response)
         console.log("\n\nfile uploaded successfully on cloudinary\n", response.url);
@@ -32,34 +39,46 @@ const uploadOnCloudinary = async (localFilePath) => {
 
     }
 }
-const deleteFromCloudinary=async (filePath)=>{
-    
+const deleteFromCloudinary = async (filePath) => {
+
     try {
         if (!filePath) {
             console.error("file path not found to delete");
             return null;
         }
-        
-        const url=filePath.split('/')
-        const fileName=url[url.length-1];
-        const publicId = fileName.substring(0, fileName.lastIndexOf('.'));
+
+        const url = filePath.split('/');
+
+        const fileName = url[url.length - 1];
+
+        const publicId = fileName.split('.')[0];
+
+        let resource_type = fileName.split('.')[1];
+
+
+
+        if (resource_type === "mp4") resource_type = "video";
+        else if (resource_type === "mp3") resource_type = "audio";
+        else resource_type = "image";
+
 
         if (!publicId) {
             console.error("Failed to extract public ID from file path.");
             return null;
         }
-        
-        const result=await cloudinary.uploader
-        .destroy(
-            publicId,
-            {
-                invalidate:true
-            }
-        )
-        // console.log(result.result,"      file removed successfully");
+
+        const result = await cloudinary.uploader
+            .destroy(
+                publicId,
+                {
+                    invalidate: true,
+                    resource_type
+                }
+            )
+        console.log(result, " file removed successfully");
         return result;
     } catch (error) {
         console.log("an error occured while deleting the image===",error);
     }
 }
-export {uploadOnCloudinary,deleteFromCloudinary};
+export { uploadOnCloudinary, deleteFromCloudinary };
