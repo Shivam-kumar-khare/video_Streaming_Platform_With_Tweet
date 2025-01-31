@@ -23,7 +23,7 @@ export const verifyJWT =asyncHandler(async (req,res,next)=>{
     
         next();
     } catch (error) {
-        throw new ApiError(401,`Error Caught in auth.midlleware.js ${error?.message||"invalid auth file"}`)
+        throw new ApiError(401,`Error :: ${error?.message||"Login failed"}`)
     }
 
 })
