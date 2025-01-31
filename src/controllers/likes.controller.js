@@ -70,16 +70,8 @@ const toggleTweetLike = asyncHandler(async (req, res) => {
 }
 )
 
-
-//Recheck This
 const getLikedVideos = asyncHandler(async (req, res) => {
-    //TODO: get all liked videos and total likes ***on each video***
-    const user=req.user._id;
-    const {videoId} = req.params;
-
-    if (!videoId||!isValidObjectId){
-        throw new ApiError(400,"Invalid Video id")
-    }
+    const user = req.user._id;
     let { page = 1, limit = 10 } = req.query;
     page = parseInt(page, 10);
     limit = parseInt(limit, 10);
@@ -90,45 +82,49 @@ const getLikedVideos = asyncHandler(async (req, res) => {
 
     const skip = (page - 1) * limit;
 
-    const totalLikes=await Like.aggregate([
+    // Get all the videos liked by the user
+    const required_data = await Like.aggregate([
         {
             $match: {
-                video: videoId
+                likedBy: user
             }
-
         },
         {
-            $count:"Total_likes"
+            $skip: skip, 
+        },
+        {
+            $limit: limit, 
+        },
+        {
+            $project: {
+                _id: 1,
+                video: 1 //0 to exclude
+            }
         }
-    ])
-    const totalLikesCount = totalLikes[0] ? totalLikes[0].Total_likes : 0;
+    ]);
 
-    const LikedVideo=await Like.aggregate([
-        {
-            $match:{
-                likedBy:user
-            }
-        },
-        {
-            $sort: {
-                updatedAt: -1, // Sort by newest first
+    
+    const videosWithLikeCount = await Promise.all(required_data.map(async (element) => {
+        const totalLikes = await Like.aggregate([
+            {
+                $match: { video: element.video }
             },
-        },
-        {
-            $skip: skip, // Skip for pagination
-        },
-        {
-            $limit: limit, // Limit the number of results
-        },
-    ])
-    const result={
-        totalLikesCount,LikedVideo
-    }
-    res.status(200).json(
-        new ApiResponse(200,result,"Success")
-    )
+            {
+                $count: "totalLikes"
+            }
+        ]);
+     
+        const totalLikesCount = totalLikes[0] ? totalLikes[0].totalLikes : 0;
+     
+        
+        return { tweetId:element._id,videoId:element.video, totalLikesCount }; 
+    }));
 
-})
+    res.status(200).json(
+        new ApiResponse(200, videosWithLikeCount, "Success")
+    );
+});
+
 
 export {
     toggleCommentLike,

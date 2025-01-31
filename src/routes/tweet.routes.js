@@ -12,7 +12,7 @@ import {upload } from "../middleware/multer.middleware.js";
 const router=Router();
 router.use(verifyJWT)
 router.route("/createTweet").post(upload.none(),createTweet);
-router.route("get-UserTweet").get(getUserTweets);
-router.route("/:tweetId").delete(deleteTweet).patch(updateTweet);
+router.route("/get-UserTweet").get(getUserTweets);
+router.route("/:tweetId").delete(deleteTweet).patch(upload.none(),updateTweet);
 
 export default router;

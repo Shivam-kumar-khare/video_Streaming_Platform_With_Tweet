@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-
+ 
 const tweetsSchema = new mongoose.Schema(
   {
   
