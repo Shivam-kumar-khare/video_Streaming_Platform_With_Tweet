@@ -26,6 +26,7 @@ import tweetRouter from "./routes/tweet.routes.js"
 import playlistRouter from "./routes/playlist.routes.js"
 import healthCheckRouter from "./routes/healthcheck.routes.js";
 import dashboardRouter from "./routes/dashboard.routes.js";
+import videoRouter from "./routes/video.routes.js";
 //routes declaration cum as  middleware 
 app.use("/api/v1/comment",commentRouter)
 app.use("api/v1/dashboard",dashboardRouter)
@@ -35,6 +36,7 @@ app.use("/api/v1/playlist",playlistRouter)
 app.use("/api/v1/subscription",subscriptionRoute)
 app.use("/api/v1/tweet",tweetRouter)
 app.use("/api/v1/user",userRouter)
+app.use("/api/v1/video",videoRouter)
 
 
 export {app};
