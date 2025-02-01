@@ -68,7 +68,7 @@ const addVideoToPlaylist = asyncHandler(async (req, res) => {
             name,
             description,
             owner,
-            video:[videoId]
+            videos:[videoId]
             
         })
 
@@ -83,11 +83,14 @@ const addVideoToPlaylist = asyncHandler(async (req, res) => {
         throw new ApiError(400,"Invalid Playlist Id")
     }
 
-    const updatedPlaylist=await Playlist.findByIdAndUpdate(
-        playlistId,
+    const updatedPlaylist=await Playlist.findOneAndUpdate(
+        {
+            _id:playlistId,
+            owner
+        },
         {
             $addToSet:{
-                video:videoId
+                videos:videoId
             }
         },
         {
@@ -95,6 +98,9 @@ const addVideoToPlaylist = asyncHandler(async (req, res) => {
         }
         
     )
+    if(!updatedPlaylist){
+        throw new ApiError(400,"you are not authenticted to update the playlist")
+    }
 
     res.status(200).json(
         new ApiResponse(200,updatedPlaylist,"Video Added Successfully")
@@ -109,7 +115,13 @@ const getMyPlaylists = asyncHandler(async (req, res) => {
     // Fetch playlists created by the authenticated user
     const playlists = await Playlist.find(
         {
-            owner: mongoose.Types.ObjectId(req.user._id)
+            owner: new mongoose.Types.ObjectId(req.user._id)
+        },
+        {
+            createdAt:0,
+            updatedAt:0,
+            owner:0,
+            __v:0
         }
     )
 
@@ -139,7 +151,12 @@ const getUserPlaylists = asyncHandler(async (req, res) => {
 
     const playlists =await Playlist.find(
         {
-            owner: mongoose.Types.ObjectId(userId)
+            owner: new mongoose.Types.ObjectId(userId)
+        },
+        {
+            createdAt:0,
+            updatedAt:0,
+            __v:0
         }
     )
 
@@ -167,7 +184,7 @@ const getPlaylistById = asyncHandler(async (req, res) => {
         throw new ApiError(400,"Invalid PlayList Id")
     }
 
-    const playList=await Playlist.findById(mongoose.Types.ObjectId(playlistId))
+    const playList=await Playlist.findById(new mongoose.Types.ObjectId(playlistId))
 
     if(!playList){
         throw new ApiError(400,"No playlist found for given Id")
@@ -237,13 +254,15 @@ const deletePlaylist = asyncHandler(async (req, res) => {
         return res.status(404).json(new ApiResponse(404, {}, "Playlist does not exist"));
     }
 
-    if (playlist.owner.toString() !== req.user._id) {
+    if (playlist.owner.toString() !== req.user._id.toString()) {
         throw new ApiError(403, "You are not authorized to delete this playlist");
     }
 
     await playlist.deleteOne();
 
-    res.status(204).send(); // 204 No Content for deletion
+    res.status(200).json(
+       new ApiResponse(200,"","Playlist deleted successfully")
+    ); // 204 No Content for deletion
 });
 
 
