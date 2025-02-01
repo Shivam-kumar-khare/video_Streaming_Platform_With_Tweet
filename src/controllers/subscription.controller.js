@@ -8,29 +8,29 @@ import { asyncHandler } from "../utils/asyncHandler.utils.js"
 const toggleSubscription = asyncHandler(async (req, res) => {
     const { channelId } = req.params;
 
-    
+
     if (!isValidObjectId(channelId)) {
         throw new ApiError(400, "Invalid channel ID");
     }
 
-    const userId = req.user._id; 
+    const userId = req.user._id;
 
-   
+
     const existingSubscription = await Subscription.findOne({
-        channel: channelId, 
-        subscriber: mongoose.Types.ObjectId(userId),
+        channel: channelId,
+        subscriber: new mongoose.Types.ObjectId(userId),
     });
 
     if (existingSubscription) {
-       
-        await existingSubscription.deleteOne(); 
+
+        await existingSubscription.deleteOne();
         return res.status(200).json(
             new ApiResponse(200, { subscribed: false }, "Unsubscribed successfully")
         );
     } else {
         const newSubscription = await Subscription.create({
-            channel: channelId,  
-            subscriber: mongoose.Types.ObjectId(userId),
+            channel: channelId,
+            subscriber: new mongoose.Types.ObjectId(userId),
         });
 
         if (!newSubscription) {
@@ -60,7 +60,7 @@ const getUserChannelSubscribers = asyncHandler(async (req, res) => {
     const subscriberData = await Subscription.aggregate([
         {
             $match: {
-                channel: mongoose.Types.ObjectId(req.user._id), // Match documents with the channel ID
+                channel: new mongoose.Types.ObjectId(req.user._id), // Match documents with the channel ID
             },
         },
         {
@@ -81,21 +81,23 @@ const getUserChannelSubscribers = asyncHandler(async (req, res) => {
         },
     ]);
 
-    // Handle no data case
-    if (!subscriberData || subscriberData.length === 0) {
-        throw new ApiError(400, "Some error occurred");
+    console.log("\n\n\n\n\n",subscriberData[0].subscribers.length===0)
+    if ( subscriberData[0].subscribers.length===0) {
+        return res.status(202).json(new ApiResponse(202,{},"no subscriber found"))
     }
 
     const result = subscriberData[0];
+
+    const transformedResult = {
+        totalSubscribers: result.totalSubscribers || 0,
+        subscribers: result.subscribers.map(sub => sub.subscriber)
+    };
 
     // Response
     res.status(200).json(
         new ApiResponse(
             200,
-            {
-                subscribers: result.subscribers || [], // Default to empty array if no subscribers
-                totalSubscribers: result.totalSubscribers || 0, // Default to 0 if undefined
-            },
+            {page,limit,...transformedResult},
             "Subscribers fetched successfully"
         )
     );
@@ -115,7 +117,7 @@ const getSubscribedChannels = asyncHandler(async (req, res) => {
     const subscribedChannelData = await Subscription.aggregate([
         {
             $match: {
-                subscriber: mongoose.Types.ObjectId(req.user._id),
+                subscriber: new mongoose.Types.ObjectId(req.user._id),
             },
         },
         {
@@ -136,19 +138,20 @@ const getSubscribedChannels = asyncHandler(async (req, res) => {
         },
     ]);
 
-    if (!subscribedChannelData || subscribedChannelData.length === 0) {
-        throw new ApiError(400, "Some error occurred");
-    }
+    // console.log(subscribedChannelData)
 
     const result = subscribedChannelData[0];
+    
 
+    const transformedResult={
+        "total Subscribed channel":result.totalSubscribedChannel||0,
+        "channel Ids":result.channel.map(element=>element._id)
+    }
+    // console.log(transformedResult)
     res.status(200).json(
         new ApiResponse(
             200,
-            {
-                channels: result.channel,
-                totalSubscribedChannel: result.totalSubscribedChannel || 0, // Fallback to 0 if undefined
-            },
+           transformedResult,
             "Channels fetched successfully"
         )
     );
