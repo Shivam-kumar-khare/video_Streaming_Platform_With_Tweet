@@ -29,9 +29,9 @@ import dashboardRouter from "./routes/dashboard.routes.js";
 import videoRouter from "./routes/video.routes.js";
 //routes declaration cum as  middleware 
 app.use("/api/v1/comment",commentRouter)
-app.use("api/v1/dashboard",dashboardRouter)
+app.use("/api/v1/dashboard",dashboardRouter)
 app.use("/api/v1/health",healthCheckRouter)
-app.use("/api/vi/like",likeRouter)
+app.use("/api/v1/like",likeRouter)
 app.use("/api/v1/playlist",playlistRouter)
 app.use("/api/v1/subscription",subscriptionRoute)
 app.use("/api/v1/tweet",tweetRouter)

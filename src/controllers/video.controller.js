@@ -11,8 +11,9 @@ import { User } from "../model/user.model.js"
 
 
 const getAllVideos = asyncHandler(async (req, res) => {
-    let { page = 1, limit = 10, query = {}, sortBy = "updatedAt", sortType = -1, userId } = req.query;
-
+    let { page = 1, limit = 10, query = {}, sortBy = "updatedAt", sortType = -1, } = req.query;
+    let {userId}=req.params;
+    console.log(query);
     // Validate userId
     if (!userId || !isValidObjectId(userId)) {
         throw new ApiError(400, "Invalid User Id");
@@ -26,7 +27,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
     const skip = (page - 1) * limit;
 
     // Parse and validate `query`
-    if (typeof query === "string") {
+    if (query && typeof query === "string") {
         try {
             query = JSON.parse(query);
         } catch (err) {

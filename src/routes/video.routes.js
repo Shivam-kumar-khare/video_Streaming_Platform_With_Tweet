@@ -21,4 +21,5 @@ router.route("/changePublished-status/:videoId").patch(verifyJWT,togglePublishSt
 router.route("/update/:videoId").patch(verifyJWT,updateVideo);//tested
 router.route("/veiw-video/:videoId").post(verifyJWT,viewVideo);//tested
 router.route("/:videoId").delete(verifyJWT,deleteVideo);//tested
+router.route("/:userId").get(getAllVideos)
 export default router;

@@ -1,7 +1,7 @@
 import { asyncHandler } from "../utils/asyncHandler.utils.js";
 import { ApiError } from "../utils/apiError.js";
 import { User } from "../model/user.model.js";
-import { uploadOnCloudinary,deleteFromCloudinary } from "../utils/cloudinary.utils.js";
+import { uploadOnCloudinary, deleteFromCloudinary } from "../utils/cloudinary.utils.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
@@ -50,9 +50,9 @@ const registerUser = asyncHandler(async (req, res) => {
     const avatarLocalPath = req.files?.avatar[0]?.path;
     // const coverimageLocalPath = req.files?.coverimage[0]?.path;
     let coverimageLocalPath;
-    if (req.files && Array.isArray(req.files.coverimage)&& req.files.coverimage.length>0) {
-        coverimageLocalPath=req.files?.coverimage[0].path
-        
+    if (req.files && Array.isArray(req.files.coverimage) && req.files.coverimage.length > 0) {
+        coverimageLocalPath = req.files?.coverimage[0].path
+
     }
 
 
@@ -126,7 +126,7 @@ const loginUser = asyncHandler(async (req, res) => {
                     "User logged in successfully"
                 )
             )
-    console.log("\n\nUser logged-in Successfully")
+        console.log("\n\nUser logged-in Successfully")
     } catch (error) {
         console.error("Error during login:", error);
         throw error;
@@ -138,8 +138,8 @@ const logoutUser = asyncHandler(async (req, res) => {
     await User.findByIdAndUpdate(
         req.user._id,
         {
-            $set:{
-                refreshToken:null
+            $set: {
+                refreshToken: null
             }
         },
         {
@@ -214,7 +214,7 @@ const changePassword = asyncHandler(async (req, res) => {
 
     // console.log("oldpassword==",oldPassword,"\nnewpassword=",newPassword)
 
-    if(!(oldPassword && newPassword)){
+    if (!(oldPassword && newPassword)) {
         throw new ApiError(400, "Both old and new passwords are required");
     }
 
@@ -244,7 +244,7 @@ const getCurrentUser = asyncHandler(async (req, res) => {
     return res
         .status(200)
         .json(
-            new ApiResponse(200,req.user,"User fetched Successfully")
+            new ApiResponse(200, req.user, "User fetched Successfully")
         )
 })
 
@@ -252,7 +252,7 @@ const updateAccountDetail = asyncHandler(async (req, res) => {
     const { fullName, email } = req.body;
 
     // Validate input
-    if (!(fullName||email)) {
+    if (!(fullName || email)) {
         throw new ApiError(400, "At least one of fullName or email is required.");
     }
 
@@ -283,77 +283,77 @@ const updateAccountDetail = asyncHandler(async (req, res) => {
     );
 })
 
-const updateUserAvatar= asyncHandler(async(req,res)=>{
-    
-    const avatarNewPath=req.file?.path
-    
-    if(!avatarNewPath){
-        throw new ApiError(400,"Avatar file not found") 
+const updateUserAvatar = asyncHandler(async (req, res) => {
+
+    const avatarNewPath = req.file?.path
+
+    if (!avatarNewPath) {
+        throw new ApiError(400, "Avatar file not found")
     }
 
-    
-    const avatarNew=await uploadOnCloudinary(avatarNewPath)
 
-    if(!avatarNew.url){
-        throw new ApiError(400,"Problem Incurred during file upload")
+    const avatarNew = await uploadOnCloudinary(avatarNewPath)
+
+    if (!avatarNew.url) {
+        throw new ApiError(400, "Problem Incurred during file upload")
     }
     // const user=await User.findById(req.user?._id)
-    const user=req.user
+    const user = req.user
     // console.log(user)
-    const oldpath=user.avatar
+    const oldpath = user.avatar
     user.avatar = avatarNew.url; // Directly update the avatar field
-    await user.save({validateBeforeSave:false});
+    await user.save({ validateBeforeSave: false });
 
     if (oldpath) {
         await deleteFromCloudinary(oldpath)
     }
-    
+
     res.status(200).json(
-        new ApiResponse(200,user,"FIlE updated successfully")
+        new ApiResponse(200, user, "FIlE updated successfully")
     )
 
 })
 
-const updateUserCoverImage= asyncHandler(async(req,res)=>{
-    
-    const coverImageNewPath=req.file?.path
-    
-    if(!coverImageNewPath){
-        throw new ApiError(400,"Cover Image  file not found")
-    }
-    const coverImageNew=await uploadOnCloudinary(coverImageNewPath)
+const updateUserCoverImage = asyncHandler(async (req, res) => {
 
-    if(!coverImageNew.url){
-        throw new ApiError(400,"Problem Incurred during file upload")
+    const coverImageNewPath = req.file?.path
+
+    if (!coverImageNewPath) {
+        throw new ApiError(400, "Cover Image  file not found")
     }
-    
+    const coverImageNew = await uploadOnCloudinary(coverImageNewPath)
+
+    if (!coverImageNew.url) {
+        throw new ApiError(400, "Problem Incurred during file upload")
+    }
+
     if (req.user?.coverimage) {
         await deleteFromCloudinary(req.user.coverimage).catch(err => {
             console.error("Error deleting old cover image:", err);
         });
     }
 
-    const user=await User.findByIdAndUpdate(
+    const user = await User.findByIdAndUpdate(
         req.user?._id,
         {
-            $set:{
-                coverImage:coverImageNew.url
+            $set: {
+                coverImage: coverImageNew.url
             }
         },
         {
-            new:true,
+            new: true,
 
         }
     ).select("-password")
-    
+
     res.status(200).json(
-        new ApiResponse(200,user,"FIlE updated successfully")
+        new ApiResponse(200, user, "FIlE updated successfully")
     )
 
 })
 
-const getUserChannelProfile = asyncHandler(async(req, res) => {
-    const {username} = req.params
+const getUserChannelProfile = asyncHandler(async (req, res) => {
+    const { username } = req.params
 
     if (!username?.trim()) {
         throw new ApiError(400, "username is missing")
@@ -362,7 +362,7 @@ const getUserChannelProfile = asyncHandler(async(req, res) => {
     const channel = await User.aggregate([
         {
             $match: {
-                username: username?.toLowerCase()
+                userName: username?.toLowerCase()
             }
         },
         {
@@ -389,7 +389,7 @@ const getUserChannelProfile = asyncHandler(async(req, res) => {
                 channelsSubscribedToCount: {
                     $size: "$subscribedTo"
                 },
-                isSubscribed: {
+                Subscribed_to_channel: {
                     $cond: {
                         //Syntax: { $in: [<value>, <array>] }
                         if: {$in: [req.user?._id, "$subscribers.subscriber"]},
@@ -405,7 +405,7 @@ const getUserChannelProfile = asyncHandler(async(req, res) => {
                 username: 1,
                 subscribersCount: 1,
                 channelsSubscribedToCount: 1,
-                isSubscribed: 1,
+                Subscribed_to_channel: 1,
                 avatar: 1,
                 coverImage: 1,
                 email: 1
@@ -417,7 +417,7 @@ const getUserChannelProfile = asyncHandler(async(req, res) => {
     if (!channel?.length) {
         throw new ApiError(404, "channel does not exists")
     }
-    console.log(channel)
+  
     return res
     .status(200)
     .json(
@@ -436,12 +436,24 @@ const getWatchHistory = asyncHandler(async (req, res) => {
             }
         },
         {
+            $project: {
+                _id: 1,
+                watchHistory: 1
+            }
+        },
+        {
             $lookup: {
                 from: "videos",
                 localField: "watchHistory",
                 foreignField: "_id",
                 as: "watchHistory",
                 pipeline: [
+                    {
+                        $project: {
+                            updatedAt: 0,
+                            __v: 0
+                        }
+                    },
                     {
                         $lookup: {
                             from: "users",
@@ -453,7 +465,8 @@ const getWatchHistory = asyncHandler(async (req, res) => {
                                     $project: {
                                         fullName: 1,
                                         userName: 1,
-                                        avatar: 1
+                                        avatar: 1,
+                                        _id: 0,
                                     }
                                 }
                             ]
@@ -462,9 +475,9 @@ const getWatchHistory = asyncHandler(async (req, res) => {
                         }
                     },
                     {
-                        $addFields:{
-                            owner:{
-                                $arrayElemAt:["$owner",0]
+                        $addFields: {
+                            owner: {
+                                $arrayElemAt: ["$owner", 0]
                             }
                         }
                     }
@@ -472,14 +485,14 @@ const getWatchHistory = asyncHandler(async (req, res) => {
             }
         }
     ])
-    if(!user){
-        throw new ApiError(402,"watch history can not be fetched ")
+    if (!user) {
+        throw new ApiError(402, "watch history can not be fetched ")
     }
     console.log(user)
     res.status(200).json(
         new ApiResponse(
             200,
-            user[0].watchHistory,
+            user/*[0].watchHistory*/,
             "History fetched successfully"
         )
     )

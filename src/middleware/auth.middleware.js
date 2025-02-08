@@ -23,7 +23,7 @@ export const verifyJWT =asyncHandler(async (req,res,next)=>{
     
         next();
     } catch (error) {
-        throw new ApiError(401,`Error :: ${error?.message||"Login failed"}`)
+        throw new ApiError(401,`Error :: ${error?.message||"Login failed"} Please login`)
     }
 
 })
