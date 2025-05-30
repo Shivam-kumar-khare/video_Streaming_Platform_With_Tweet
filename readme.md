@@ -1,7 +1,7 @@
-# <u><b>Video Streaming Platform with Tweet Functionality</u></b>  
+# <u><b>🎬 Video Streaming & Social Media Backend</u></b>  
 
 ## 📌 Project Description  
-## 📌 Project Description  
+
 
 This project is a **feature-rich video streaming platform** seamlessly integrated with **tweet-like social interactions**. It enables users to **upload, view, and engage with videos** while fostering community interaction through **comments, likes, tweets, and subscriptions**. The platform offers a **comprehensive suite of content management tools**, allowing users to **create and manage playlists, track watch history, and subscribe to channels**. With robust **user authentication, real-time engagement features, and detailed analytics**, this system provides an **immersive and dynamic media-sharing experience**.
 ## 🚀 Features  
